@@ -1,0 +1,7 @@
+*.tfstate*
+.terraform/
+*.tfvars
+
+mkdir -p depi-aws-security-mini-project-1/{terraform,docs,screenshots/{01-budget,02-iam,03-vpc,04-security,05-endpoints,06-ec2,07-storage,08-rds,09-alb,10-cloudfront,11-logging,12-lambda,13-peering,14-backup}} && \
+touch depi-aws-security-mini-project-1/terraform/{versions,variables,budget,iam,vpc,security,endpoints,ec2,storage,rds,alb,cloudfront,logging,lambda,peering,backup,outputs}.tf \
+      depi-aws-security-mini-project-1/docs/{architecture,security-controls,testing}.md
