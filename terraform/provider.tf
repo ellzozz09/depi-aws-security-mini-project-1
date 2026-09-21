@@ -1,11 +1,12 @@
 provider "aws" {
   region = "us-east-1"
+  profile = "depi-sec-admin"
   default_tags {
     tags = {
-    Project     = "depi-mini-project-1"
-    Owner       = "security-team"
-    Environment = "lab"
-    ManagedBy   = "terraform"
-    }     
+      Project     = "depi-aws-security-mini-project-1"
+      Owner       = "depi-sec-admin"
+      Environment = "lab"
+      ManagedBy   = "terraform"
+    }
   }
 }
