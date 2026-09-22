@@ -1,6 +1,9 @@
-# Admin IAM User
+#IAM Users
 data "aws_iam_user" "admin" {
   user_name = "depi-sec-admin"
+}
+resource "aws_iam_user" "dev_1" {
+  name = "depi-dev-1"
 }
 
 # Permission Policies
@@ -46,11 +49,10 @@ resource "aws_iam_role" "budgets_role" {
 }
 
 # IAM Groups
+## My Group
 resource "aws_iam_group" "sec_group" {
   name = "depi-sec-group"
 }
-
-## Groups Membership
 resource "aws_iam_group_membership" "sec_group_membership" {
   name  = "depi-sec-group-membership"
   group = aws_iam_group.sec_group.name
@@ -58,4 +60,77 @@ resource "aws_iam_group_membership" "sec_group_membership" {
   users = [
     data.aws_iam_user.admin.user_name
   ]
+}
+## Devs Group
+resource "aws_iam_group" "devs_group" {
+  name = "depi-sec-developers"
+}
+resource "aws_iam_group_policy_attachment" "developers_readonly" {
+  group      = aws_iam_group.devs_group.name
+  policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
+}
+resource "aws_iam_user_group_membership" "dev_1_membership" {
+  user = aws_iam_user.dev_1.name
+
+  groups = [
+    aws_iam_group.devs_group.name
+  ]
+}
+resource "aws_iam_user_login_profile" "dev_1_login" { # add console access
+  user = aws_iam_user.dev_1.name
+}
+output "depi_dev_1_initial_password" {
+  value     = aws_iam_user_login_profile.dev_1_login.password
+  sensitive = true # hide password from output
+}
+
+# S3 Bucket Policy
+resource "aws_iam_policy" "s3_app_read" {
+  name        = "depi-sec-s3-app-read"
+  description = "Allows read-only access to objects in the depi-sec-app bucket only"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid      = "AllowS3AppBucketReadOnly"
+        Effect   = "Allow"
+        Action   = "s3:GetObject"
+        Resource = "${aws_s3_bucket.app_bucket.arn}/*"
+      }
+    ]
+  })
+}
+
+# EC2 Role
+resource "aws_iam_role" "ec2_role" {
+  name = "depi-sec-ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowEC2AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_ssm_core" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_s3_app_read" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = aws_iam_policy.s3_app_read.arn
+}
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "depi-sec-ec2-profile"
+  role = aws_iam_role.ec2_role.name
 }
