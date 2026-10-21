@@ -1,6 +1,25 @@
+# Local .terraform directories
 .terraform/
+
+# .tfstate files (Contains infrastructure snapshot and plaintext secrets)
 *.tfstate
 *.tfstate.*
+
+# .tfvars files (Contains sensitive variable inputs)
 *.tfvars
+*.tfvars.json
+
+# Allow example variable templates to be committed
 !*.tfvars.example
+
+# Terraform plan files (CRITICAL: Contains plaintext secrets and state data)
+*.tfplan
+
+# Crash logs
 crash.log
+
+# Ignore override files (Keeps local testing configurations out of the repo)
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
