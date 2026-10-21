@@ -1,15 +1,2 @@
-## Why AWS Budgets Are a Core Security Control
-When people think of AWS Budgets, they usually think of finance, cost accounting, and avoiding surprise bills. However, in cloud infrastructure, a budget is a critical layer of defense-in-depth security.
-
-In AWS, financial anomalies are almost always security anomalies first. A compromised root account or leaked IAM credential rarely goes unnoticed for long because attackers immediately deploy high-cost resources such as running massive clusters of GPU-accelerated EC2 instances for crypto-mining or launching high-capacity RDS databases for data exfiltration staging. Without automated budget alerts and response controls, an unmitigated credential leak can rack up tens of thousands of dollars in debt within hours while stealthily operating beneath standard perimeter monitoring.
-
-By combining AWS Budgets with automated enforcement actions—such as attaching a deny policy (depi-sec-deny-expensive) via an IAM role when threshold costs are breached—a budget evolves from a passive reporting tool into an active breach containment mechanism. It establishes a hard guardrail that automatically caps blast radiuses, halts unauthorized resource provisioning, and alerts security operations in real time, effectively converting a potentially catastrophic cloud takeover into a contained, manageable event.
-
-| Identity / Component | Resource Type | What It Can Do | Why (Security Rationale) |
-| :--- | :--- | :--- | :--- |
-| **Password Policy** | Account Baseline | Enforces minimum length of 14 characters, upper and lowercase letters, numbers, symbols, and 90-day credential rotation. | Eliminates weak authentication vectors, mitigates brute-force attacks, and limits the window of opportunity for leaked static web credentials. |
-| **`depi-sec-developers`** | IAM Group | Inherits `ReadOnlyAccess` AWS Managed Policy across all services. | Enforces central group-based access management and the Principle of Least Privilege for developers, preventing unintended infrastructure modifications. |
-| **`depi-dev-1`** | IAM User | Authenticates to the AWS Management Console with forced password reset on first sign-in; inherits read-only access via `depi-sec-developers`. | Assigns individual accountability for human access without issuing long-lived access keys or elevated administrative privileges. |
-| **`depi-sec-s3-app-read`** | Customer Managed Policy | Explicitly allows `s3:GetObject` solely on objects within `arn:aws:s3:::depi-sec-app-<suffix>/*`. | Strictly constrains data retrieval. Banning bucket-level listing (`s3:ListBucket`) and resource wildcards (`*`) prevents lateral movement and cross-bucket exfiltration if the application host is compromised. |
-| **`depi-sec-ec2-role`** | IAM Role | Assumed by the EC2 service (`ec2.amazonaws.com`); attached to `AmazonSSMManagedInstanceCore` and `depi-sec-s3-app-read`. | Provides temporary credentials via AWS Security Token Service (STS) to the workload, removing the need to embed static AWS access keys on virtual server file systems. Enables secure shell access via Systems Manager (SSM) without open SSH ports. |
-| **`depi-sec-ec2-role` (Profile)** | Instance Profile | Acts as the structural container that attaches `depi-sec-ec2-role` to EC2 instances. | Required by EC2 hardware to securely pass temporary IAM role credentials directly to the instance metadata service . |
+# Security Groups Chaining
+![alt text](../screenshots/05-security/05-sg-chaining.png)
