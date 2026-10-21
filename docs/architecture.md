@@ -1,8 +1,8 @@
-| Identity / Component | Resource Type | What It Can Do | Why (Security Rationale) |
-| :--- | :--- | :--- | :--- |
-| **Password Policy** | Account Baseline | Enforces minimum length of 14 characters, upper and lowercase letters, numbers, symbols, and 90-day credential rotation. | Eliminates weak authentication vectors, mitigates brute-force attacks, and limits the window of opportunity for leaked static web credentials. |
-| **`depi-sec-developers`** | IAM Group | Inherits `ReadOnlyAccess` AWS Managed Policy across all services. | Enforces central group-based access management and the Principle of Least Privilege for developers, preventing unintended infrastructure modifications. |
-| **`depi-dev-1`** | IAM User | Authenticates to the AWS Management Console with forced password reset on first sign-in; inherits read-only access via `depi-sec-developers`. | Assigns individual accountability for human access without issuing long-lived access keys or elevated administrative privileges. |
-| **`depi-sec-s3-app-read`** | Customer Managed Policy | Explicitly allows `s3:GetObject` solely on objects within `arn:aws:s3:::depi-sec-app-<suffix>/*`. | Strictly constrains data retrieval. Banning bucket-level listing (`s3:ListBucket`) and resource wildcards (`*`) prevents lateral movement and cross-bucket exfiltration if the application host is compromised. |
-| **`depi-sec-ec2-role`** | IAM Role | Assumed by the EC2 service (`ec2.amazonaws.com`); attached to `AmazonSSMManagedInstanceCore` and `depi-sec-s3-app-read`. | Provides temporary credentials via AWS Security Token Service (STS) to the workload, removing the need to embed static AWS access keys on virtual server file systems. Enables secure shell access via Systems Manager (SSM) without open SSH ports. |
-| **`depi-sec-ec2-role` (Profile)** | Instance Profile | Acts as the structural container that attaches `depi-sec-ec2-role` to EC2 instances. | Required by EC2 hardware to securely pass temporary IAM role credentials directly to the instance metadata service . |
+# Subnet Table
+| Subnet Name        | CIDR Block   | Availability Zone | Type                |
+| ------------------ | ------------ | ----------------- | ------------------- |
+| depi-sec-public-a  | 10.0.1.0/24  | us-east-1a        | Public              |
+| depi-sec-public-b  | 10.0.2.0/24  | us-east-1b        | Public              |
+| depi-sec-private-a | 10.0.11.0/24 | us-east-1a        | Private             |
+| depi-sec-private-b | 10.0.12.0/24 | us-east-1b        | Private             |
+| depi-sec-tools-a   | 10.1.1.0/24  | us-east-1a        | Private (Tools VPC) |
