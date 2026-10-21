@@ -68,8 +68,11 @@ resource "aws_budgets_budget_action" "deny_expensive_action" {
     }
   }
 
-  subscriber {
-    subscription_type = "EMAIL"
-    address           = var.alert_emails[0]
+  dynamic "subscriber" {
+    for_each = var.alert_emails
+    content {
+      subscription_type = "EMAIL"
+      address           = subscriber.value
+    }
   }
 }
