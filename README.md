@@ -1,8 +1,14 @@
 # Secure-AWS-Web-Platform
 Secure AWS Web Platform built with Terraform featuring private networking, CloudFront, ALB, EC2, RDS, EFS, monitoring, automated security remediation, backup protection, and IaC best practices
 
-# IAM & Security Identities
+# Why AWS Budgets Are a Core Security Control
+When people think of AWS Budgets, they usually think of finance, cost accounting, and avoiding surprise bills. However, in cloud infrastructure, a budget is a critical layer of defense-in-depth security.
 
+In AWS, financial anomalies are almost always security anomalies first. A compromised root account or leaked IAM credential rarely goes unnoticed for long because attackers immediately deploy high-cost resources such as running massive clusters of GPU-accelerated EC2 instances for crypto-mining or launching high-capacity RDS databases for data exfiltration staging. Without automated budget alerts and response controls, an unmitigated credential leak can rack up tens of thousands of dollars in debt within hours while stealthily operating beneath standard perimeter monitoring.
+
+By combining AWS Budgets with automated enforcement actions—such as attaching a deny policy (depi-sec-deny-expensive) via an IAM role when threshold costs are breached—a budget evolves from a passive reporting tool into an active breach containment mechanism. It establishes a hard guardrail that automatically caps blast radiuses, halts unauthorized resource provisioning, and alerts security operations in real time, effectively converting a potentially catastrophic cloud takeover into a contained, manageable event.
+
+# IAM & Security Identities
 | Identity / Component | Resource Type | What It Can Do | Why (Security Rationale) |
 | :--- | :--- | :--- | :--- |
 | **`depi-sec-developers`** | IAM Group | Inherits `ReadOnlyAccess` AWS Managed Policy across all services. | Enforces central group-based access management and the Principle of Least Privilege for developers, preventing unintended infrastructure modifications. |

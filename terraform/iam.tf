@@ -6,6 +6,19 @@ resource "aws_iam_user" "dev_1" {
   name = "depi-dev-1"
 }
 
+# Password Policy
+resource "aws_iam_account_password_policy" "password_policy" {
+  minimum_password_length        = 14
+  require_uppercase_characters   = true
+  require_lowercase_characters   = true
+  require_numbers                = true
+  require_symbols                = true
+  max_password_age               = 90
+  password_reuse_prevention      = 5
+  allow_users_to_change_password = true
+  hard_expiry                    = false
+}
+
 # Permission Policies
 ## Deny EC2 and RDS
 resource "aws_iam_policy" "deny_expensive" {
@@ -76,7 +89,7 @@ resource "aws_iam_user_group_membership" "dev_1_membership" {
     aws_iam_group.devs_group.name
   ]
 }
-resource "aws_iam_user_login_profile" "dev_1_login" { # add console access
+resource "aws_iam_user_login_profile" "dev_1_login" {
   user = aws_iam_user.dev_1.name
 }
 output "depi_dev_1_initial_password" {
