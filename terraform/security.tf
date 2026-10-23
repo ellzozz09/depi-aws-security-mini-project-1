@@ -81,4 +81,74 @@ resource "aws_vpc_security_group_egress_rule" "efs_egress_all" {
   security_group_id = aws_security_group.efs_sg.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
-} 
+}
+
+# NACL
+resource "aws_network_acl" "private_nacl" {
+  vpc_id     = aws_vpc.app_vpc.id
+  subnet_ids = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+
+  # Inbound Rule 100: Allow HTTP from VPC
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "10.0.0.0/16"
+    from_port  = 80
+    to_port    = 80
+  }
+
+  # Inbound Rule 110: Allow HTTPS from VPC
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "10.0.0.0/16"
+    from_port  = 443
+    to_port    = 443
+  }
+
+  # Inbound Rule 120: Allow Ephemeral Return Traffic from VPC
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 120
+    action     = "allow"
+    cidr_block = "10.0.0.0/16"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
+  # Inbound Rule 200: Explicit Deny SSH
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 200
+    action     = "deny"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 22
+    to_port    = 22
+  }
+
+  # Outbound Rule 100: Allow all internal VPC traffic
+  egress {
+    protocol   = "-1"
+    rule_no    = 100
+    action     = "allow"
+    cidr_block = "10.0.0.0/16"
+    from_port  = 0
+    to_port    = 0
+  }
+
+  # Outbound Rule 110: Allow HTTPS externally
+  egress {
+    protocol   = "tcp"
+    rule_no    = 110
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 443
+    to_port    = 443
+  }
+
+  tags = {
+    Name = "depi-sec-private-nacl"
+  }
+}
