@@ -118,6 +118,16 @@ resource "aws_network_acl" "private_nacl" {
     to_port    = 65535
   }
 
+  # Inbound Rule 130: Allow Ephemeral Return Traffic from S3
+  ingress {
+    protocol   = "tcp"
+    rule_no    = 130
+    action     = "allow"
+    cidr_block = "0.0.0.0/0"
+    from_port  = 1024
+    to_port    = 65535
+  }
+
   # Inbound Rule 200: Explicit Deny SSH
   ingress {
     protocol   = "tcp"
