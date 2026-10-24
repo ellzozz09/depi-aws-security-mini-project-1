@@ -8,7 +8,7 @@ In AWS, financial anomalies are almost always security anomalies first. A compro
 
 By combining AWS Budgets with automated enforcement actions—such as attaching a deny policy (depi-sec-deny-expensive) via an IAM role when threshold costs are breached—a budget evolves from a passive reporting tool into an active breach containment mechanism. It establishes a hard guardrail that automatically caps blast radiuses, halts unauthorized resource provisioning, and alerts security operations in real time, effectively converting a potentially catastrophic cloud takeover into a contained, manageable event.
 
-# IAM & Security Identities
+# IAM Identities
 | Identity / Component | Resource Type | What It Can Do | Why (Security Rationale) |
 | :--- | :--- | :--- | :--- |
 | **`depi-sec-developers`** | IAM Group | Inherits `ReadOnlyAccess` AWS Managed Policy across all services. | Enforces central group-based access management and the Principle of Least Privilege for developers, preventing unintended infrastructure modifications. |
@@ -18,3 +18,6 @@ By combining AWS Budgets with automated enforcement actions—such as attaching 
 
 # Security Groups vs NACLs
 `Security Groups` operate at the **instance level** as a **stateful** firewall, automatically permitting return traffic for any allowed outbound connection. In contrast, Network Access Control Lists (NACLs) function at the **subnet** boundary as a **stateless** defense layer, requiring explicit inbound and outbound rules—including provisions for ephemeral ports—to authorize data flow. Together, they form a **defense-in-depth** architecture where NACLs protect the broad network perimeter and Security Groups enforce zero-trust, identity-based access between individual compute resources.
+
+# Why No SSH Key is Safer
+Eliminating traditional SSH keys drastically reduces the compute layer's attack surface. Static key pairs (PEM files) are notoriously vulnerable to being lost, accidentally leaked in source code repositories, or stolen from developer machines, granting permanent backdoor access to whoever holds them. Furthermore, traditional SSH requires opening Port 22 inbound, which exposes the network to continuous scanning and brute-force attacks. By replacing SSH keys with AWS Systems Manager (SSM) Session Manager, access is governed entirely by dynamic, heavily audited IAM permissions over an encrypted outbound tunnel, allowing you to manage instances securely without opening any inbound ports, maintaining bastion hosts, or risking compromised credentials.
